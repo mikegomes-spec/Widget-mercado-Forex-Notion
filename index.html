@@ -1,27 +1,183 @@
-<!-- TradingView Widget BEGIN -->
-<div class="tradingview-widget-container">
-  <div class="tradingview-widget-container__widget"></div>
-  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-  {
-    "symbols": [
-      { "proName": "FX:EURUSD", "title": "EUR/USD" },
-      { "proName": "FX:USDJPY", "title": "USD/JPY" },
-      { "proName": "FX:GBPUSD", "title": "GBP/USD" },
-      { "proName": "FX:AUDUSD", "title": "AUD/USD" },
-      { "proName": "FX:USDCAD", "title": "USD/CAD" },
-      { "proName": "FX:USDCHF", "title": "USD/CHF" },
-      { "proName": "FX:NZDUSD", "title": "NZD/USD" },
-      { "proName": "FX:EURGBP", "title": "EUR/GBP" },
-      { "proName": "FX:EURJPY", "title": "EUR/JPY" },
-      { "proName": "FX:GBPJPY", "title": "GBP/JPY" }
-    ],
-    "showSymbolLogo": true,
-    "colorTheme": "light",
-    "isTransparent": false,
-    "displayMode": "adaptive",
-    "locale": "es",
-    "backgroundColor": "#eaf3ff"
-  }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Divisas Widget Notion</title>
+  <style>
+    :root {
+      /* Color exacto de fondo azul celeste de las tarjetas de Notion */
+      --bg-color: #E8F2FA;
+      --card-bg: #FFFFFF;
+      --text-color: #1F2937;
+      --text-secondary: #6B7280;
+      --green-color: #10B981;
+      --red-color: #EF4444;
+      --border-radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 8px;
+      overflow: hidden;
+    }
+
+    /* Contenedor tipo Tarjeta de Notion */
+    .notion-widget-card {
+      background-color: var(--bg-color);
+      border-radius: var(--border-radius);
+      width: 100%;
+      padding: 12px 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    /* Carrusel Ticker Tape */
+    .ticker-wrap {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      background: transparent;
+      padding: 4px 0;
+    }
+
+    .ticker-move {
+      display: flex;
+      white-space: nowrap;
+      animation: marquee 35s linear infinite;
+      width: max-content;
+    }
+
+    .ticker-wrap:hover .ticker-move {
+      animation-play-state: paused;
+    }
+
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      padding: 6px 14px;
+      margin-right: 10px;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      font-size: 13px;
+    }
+
+    .symbol {
+      font-weight: 700;
+      color: var(--text-color);
+    }
+
+    .price {
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .change {
+      font-weight: 600;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .change.up {
+      color: var(--green-color);
+      background-color: rgba(16, 185, 129, 0.1);
+    }
+
+    .change.down {
+      color: var(--red-color);
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    @keyframes marquee {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    /* TradingView Widget Container (Opción 2) */
+    .tradingview-widget-container {
+      border-radius: 12px;
+      overflow: hidden;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="notion-widget-card">
+    <div class="widget-header">
+      <span>🪙</span>
+      <span>Divisas principales</span>
+    </div>
+
+    <!-- Carrusel Horizontal con movimiento continuo y suave -->
+    <div class="ticker-wrap">
+      <div class="ticker-move" id="ticker-content">
+        <!-- Generado dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Datos iniciales de las 10 divisas principales
+    const forexData = [
+      { symbol: "EUR/USD", price: "1.0842", change: "+0.15%", up: true },
+      { symbol: "USD/JPY", price: "154.20", change: "-0.28%", up: false },
+      { symbol: "GBP/USD", price: "1.2985", change: "+0.32%", up: true },
+      { symbol: "AUD/USD", price: "0.6650", change: "-0.10%", up: false },
+      { symbol: "USD/CAD", price: "1.3680", change: "-0.05%", up: false },
+      { symbol: "USD/CHF", price: "0.8845", change: "+0.08%", up: true },
+      { symbol: "NZD/USD", price: "0.5975", change: "+0.18%", up: true },
+      { symbol: "EUR/GBP", price: "0.8350", change: "-0.12%", up: false },
+      { symbol: "EUR/JPY", price: "167.18", change: "-0.14%", up: false },
+      { symbol: "GBP/JPY", price: "200.22", change: "+0.04%", up: true }
+    ];
+
+    function createTickerItems(items) {
+      return items.map(item => `
+        <div class="ticker-item">
+          <span class="symbol">${item.symbol}</span>
+          <span class="price">${item.price}</span>
+          <span class="change ${item.up ? 'up' : 'down'}">
+            ${item.up ? '▲' : '▼'} ${item.change}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    // Renderizamos dos veces para la animación infinita sin interrupciones
+    const tickerContainer = document.getElementById('ticker-content');
+    const htmlContent = createTickerItems(forexData);
+    tickerContainer.innerHTML = htmlContent + htmlContent;
   </script>
-</div>
-<!-- TradingView Widget END -->
+</body>
+  </html>
